@@ -28,9 +28,9 @@ Route::put('/posts/{post}', PostController::class .'@update')->name('posts.updat
 
 Route::delete('/posts/{post}', PostController::class .'@destroy')->name('posts.destroy');
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/user', function () {
+    return view('welcome');
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');
