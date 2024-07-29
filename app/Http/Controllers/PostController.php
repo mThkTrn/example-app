@@ -4,18 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
-
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+    /**
+     * Constructor to apply middleware
+     */
+    public function __construct()
+    {
+        // Apply auth middleware to all methods except index and show
+        $this->middleware('auth')->except(['index', 'show']);
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        $posts = Post::all();
+    {   
+        $posts = Post::with('user')->get();
         return view('posts.index', compact('posts'));
     }
 
@@ -31,10 +40,12 @@ class PostController extends Controller
             'body' => 'required',
             'title' => 'required'
         ]);
-
-        Post::create($request->all());
+    
+        $post = new Post($request->all());
+        $post->user_id = Auth::id(); // Associate the post with the logged-in user
+        $post->save();
+    
         return redirect()->route('posts.index')->with('success','Post created!');
-
     }
 
     /**
@@ -45,7 +56,7 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
         return view('posts.show', compact('post'));
     }
 
@@ -63,7 +74,13 @@ class PostController extends Controller
             'title' => 'required'
         ]);
 
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
+
+        // Check if the authenticated user is the owner of the post
+        if (Auth::id() !== $post->user_id) {
+            return redirect()->route('posts.index')->with('error', 'Unauthorized action.');
+        }
+
         $post->update($request->all());
         return redirect()->route('posts.index')->with('success', 'Post updated!');
     }
@@ -76,10 +93,15 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
+
+        // Check if the authenticated user is the owner of the post
+        if (Auth::id() !== $post->user_id) {
+            return redirect()->route('posts.index')->with('error', 'Unauthorized action.');
+        }
+
         $post->delete();
-        return redirect()->route('posts.index')
-          ->with('success', 'Post deleted');
+        return redirect()->route('posts.index')->with('success', 'Post deleted');
     }
 
     public function create()
@@ -89,7 +111,13 @@ class PostController extends Controller
 
     public function edit($id)
     {
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
+
+        // Check if the authenticated user is the owner of the post
+        if (Auth::id() !== $post->user_id) {
+            return redirect()->route('posts.index')->with('error', 'Unauthorized action.');
+        }
+
         return view('posts.edit', compact('post'));
     }
 }

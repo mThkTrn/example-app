@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddTitleToPostsTable extends Migration
+class AddUserIdToPostsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,21 +14,15 @@ class AddTitleToPostsTable extends Migration
     public function up()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->text("title");
-            $table->text("body");
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
         });
     }
-
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
+    
     public function down()
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->dropColumn("title");
-            $table->dropColumn("body")
+            $table->dropForeign(['user_id']);
+            $table->dropColumn('user_id');
         });
     }
 }
