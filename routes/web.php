@@ -28,6 +28,10 @@ Route::put('/posts/{post}', PostController::class .'@update')->name('posts.updat
 
 Route::delete('/posts/{post}', PostController::class .'@destroy')->name('posts.destroy');
 
+Route::get('login/google', [SocialController::class, 'redirectToGoogle']);
+
+Route::get('nova/google/callback', [SocialController::class, 'processGoogleCallback']);
+
 Route::get('/user', function () {
     return view('welcome');
 });
