@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SocialController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,6 +28,14 @@ Route::get('/posts/{post}/edit', PostController::class .'@edit')->name('posts.ed
 Route::put('/posts/{post}', PostController::class .'@update')->name('posts.update');
 
 Route::delete('/posts/{post}', PostController::class .'@destroy')->name('posts.destroy');
+
+Route::get('login/google', [SocialController::class, 'redirectToGoogle']);
+
+Route::get('nova/google/callback', [SocialController::class, 'processGoogleCallback']);
+
+Route::get('/logincustom', function () {
+    return view('logincustom');
+})->name('logincustom');
 
 Route::get('/user', function () {
     return view('welcome');
