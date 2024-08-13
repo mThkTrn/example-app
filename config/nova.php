@@ -203,4 +203,7 @@ return [
         'stopped' => '/',
     ],
 
+    'routes' => [
+        'login' => '/logincustom',
+    ],
 ];
